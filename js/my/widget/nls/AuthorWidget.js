@@ -4,5 +4,5 @@ define({
 		title: "The localed title",
 		body: "The arbitrary localed body"
 	},
-	"cs": true
+	"cs-cz": true
 });
