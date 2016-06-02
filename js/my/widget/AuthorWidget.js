@@ -10,9 +10,9 @@ define([
 	"dojo/mouse",
 	"dojo/parser",
 	"dojo/i18n",
+	"require", // context-sensitive require to get URLs to resources from relative paths
 	"dojo/i18n!./nls/AuthorWidget",
-	"require" // context-sensitive require to get URLs to resources from relative paths
-], function(declare, _WidgetBase, _TemplatedMixin, template, domStyle, baseFx, lang, on, mouse, parser, i18n){
+], function(declare, _WidgetBase, _TemplatedMixin, template, domStyle, baseFx, lang, on, mouse, parser, i18n, require){
         return declare([_WidgetBase, _TemplatedMixin], {
             // Some default values for our author
 			// These typically map to whatever you're handing into the constructor
