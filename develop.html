@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Tutorial: Hello Dojo!</title>
+    <link rel="stylesheet" href="src/dijit/themes/claro/claro.css" media="screen" />
+    <link rel="stylesheet" href="js/my/widget/css/AuthorWidget.css" media="screen" />
+</head>
+<body class="claro">
+    <h1 id="greeting">Dojo!</h1>
+
+
+    <div id="authorContainer"></div>
+
+
+    <script type="text/javascript">
+	var dojoConfig = {
+	    baseUrl: "./js/",
+	    tlmSiblingOfDojo: false,
+	    packages: [
+		{ name: "dojo", location: "../src/dojo" },
+		{ name: "dijit", location: "../src/dijit" },
+		{ name: "dojox", location: "../src/dojox" },
+		{ name: "my", location: "my", main: "app" }
+	   ],
+	   locale: "cs-cz"
+	};
+    </script>
+    <script  src="src/dojo/dojo.js"></script>
+    <script type="text/javascript">
+    require(["dojo/request", "dojo/dom", "dojo/_base/array", "my/widget/AuthorWidget", "dojo/domReady!"],
+    function(request, dom, arrayUtil, AuthorWidget){
+    // Load up our authors
+    request("js/my/data/authors.json", {
+        handleAs: "json"
+    }).then(function(authors){
+        // Get a reference to our container
+        var authorContainer = dom.byId("authorContainer");
+
+        arrayUtil.forEach(authors, function(author){
+            // Create our widget and place it
+            var widget = new AuthorWidget(author).placeAt(authorContainer);
+        });
+     });
+   }); 
+    </script>
+</body>
+</html>
