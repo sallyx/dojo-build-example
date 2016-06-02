@@ -11,7 +11,7 @@ define([
 	"dojo/parser",
 	"dojo/i18n",
 	"require", // context-sensitive require to get URLs to resources from relative paths
-	"dojo/i18n!./nls/AuthorWidget",
+	"dojo/i18n!./nls/AuthorWidget"
 ], function(declare, _WidgetBase, _TemplatedMixin, template, domStyle, baseFx, lang, on, mouse, parser, i18n, require){
         return declare([_WidgetBase, _TemplatedMixin], {
             // Some default values for our author
@@ -34,6 +34,12 @@ define([
 			baseBackgroundColor: "#fff",
 			mouseBackgroundColor: "#def",
 			imageBasePath: './images',
+
+			postMixInProperties: function () {
+				this.inherited(arguments);
+				var locale = i18n.getLocalization("my/widget","AuthorWidget");
+				this.buttonTitle= locale.title;
+			},
 
 			// postCreate is called once our widget's DOM is ready,
 			// but BEFORE it's been inserted into the page!
@@ -60,11 +66,6 @@ define([
 				parser.parse();
 				var locale = i18n.getLocalization("my/widget","AuthorWidget");
 				this.textNode.innerHTML = locale.body;
-			},
-			postMixInProperties: function () {
-				this.inherited(arguments);
-				var locale = i18n.getLocalization("my/widget","AuthorWidget");
-				this.buttonTitle= locale.title;
 			},
 
 			// This method is automatically invoked anytime anyone calls
