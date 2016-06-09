@@ -28,8 +28,8 @@ var profile = (function(){
                 customBase: true,
                 boot: true
             }
-           , "my/widget": { include: [ "my/widget/AuthorWidget", "my/widget/templates/AuthorWidget.html" ] }
-           //, "my/widget": { include: [ "my/widget/all" ] }
+           //, "my/widget": { include: [ "my/widget/AuthorWidget" ] }
+           , "my/widget": { include: [ "my/widget/all" ] }
         },
 	layerOptimize: "closure",
 	optimize: "closure",

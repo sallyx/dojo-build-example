@@ -11,6 +11,7 @@ define([
 	"dojo/parser",
 	"dojo/i18n",
 	"require", // context-sensitive require to get URLs to resources from relative paths
+	"dijit/form/Button",
 	"dojo/i18n!./nls/AuthorWidget"
 ], function(declare, _WidgetBase, _TemplatedMixin, template, domStyle, baseFx, lang, on, mouse, parser, i18n, require){
         return declare([_WidgetBase, _TemplatedMixin], {
@@ -37,7 +38,7 @@ define([
 
 			postMixInProperties: function () {
 				this.inherited(arguments);
-				var locale = i18n.getLocalization("my/widget","AuthorWidget");
+				var locale = i18n.getLocalization('my/widget',"AuthorWidget");
 				this.buttonTitle= locale.title;
 			},
 
