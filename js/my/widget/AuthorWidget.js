@@ -36,6 +36,8 @@ define([
 			mouseBackgroundColor: "#def",
 			imageBasePath: './images',
 
+			stopParser:1, //stop parser parse AuthorWidget.html (its already parsed by _TemplatedMixin)
+
 			postMixInProperties: function () {
 				this.inherited(arguments);
 				var locale = i18n.getLocalization('my/widget',"AuthorWidget");
