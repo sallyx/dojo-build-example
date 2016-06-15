@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Dojo Editor</title>
+    <link rel="stylesheet" href="src/dijit/themes/claro/claro.css" media="screen" />
+    <style type="text/css">
+	#wipeTarget span {display:block;border:1px solid blue;}
+    </style>
+</head>
+<body class="claro">
+    <h1 id="greeting">Dojo animate!</h1>
+
+    <button id="wipeOutButton">wipe out</button>
+
+    <div id="wipeTarget"  style="border:1px solid red; width:300px; height:300px;overflow:auto;">
+	    <span>muhehehe</span>
+	    <p>Lorem ipsum doret sumit.</p>
+    </div>
+
+    <script type="text/javascript">
+	var dojoConfig = {
+	    baseUrl: "./src/dojo/",
+	    selectorEngine: "lite",
+	    tlmSiblingOfDojo: true,
+	    locale: "cs-cz"
+	};
+    </script>
+    <script  src="src/dojo/dojo.js"></script>
+    <script>
+    require(["dojo/_base/fx","dojo/fx", "dojo/on", "dojo/dom", "dojo/dom-construct", "dojo/query", "dojo/domReady!"], function(baseFx,fx, on, dom, domConstruct) {
+        var wipeOutButton = dom.byId("wipeOutButton"),
+            wipeTarget = dom.byId("wipeTarget");
+
+        on(wipeOutButton, "click", function(evt){
+		domConstruct.create('span',{
+			'innerHTML' : 'fafas adfasd fasd'
+		}, wipeTarget,"last");
+        });
+	on(wipeTarget,'span:click',function() {
+		alert('jupi');
+	});
+    });
+    </script>
+</body>
+</html>

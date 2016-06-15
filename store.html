@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Dojo</title>
+    <link rel="stylesheet" href="src/dijit/themes/claro/claro.css" media="screen" />
+    <style type="text/css">
+	#wipeTarget span {display:block;border:1px solid blue;}
+    </style>
+</head>
+<body class="claro">
+    <h1 id="greeting">Dojo store!</h1>
+
+    <div id="chartNode" style="max-width:800px;height:400px;"></div>
+
+    <script type="text/javascript">
+	var dojoConfig = {
+	    baseUrl: "./src/dojo/",
+	    selectorEngine: "lite",
+	    tlmSiblingOfDojo: true,
+	    locale: "cs-cz"
+	};
+    </script>
+    <script  src="src/dojo/dojo.js"></script>
+    <script>
+    require([
+	"dojo/dom",
+	"dojo/dom-construct",
+	"dojo/store/Observable",
+	"dojo/store/Memory",
+	"dojox/charting/StoreSeries",
+	"dojox/charting/Chart",
+	"dojox/charting/plot2d/Lines",
+	"dojox/charting/themes/Tom", 
+	"dojo/_base/array",
+	"dojox/charting/plot2d/Markers",
+	"dojox/charting/axis2d/Default",
+	"dojo/store/api/Store",
+	"dojo/domReady!"
+    ],
+	 function(dom, domConstruct,ObservableStore,MemoryStore,StoreSeries, Chart,PlotType, theme, arrays) {
+	 var employees = [
+            {name:"Jim", department:"accounting"},
+            {name:"Bill", department:"engineering"},
+            {name:"Mike", department:"sales"},
+            {name:"John", department:"sales"}
+        ];
+        var employeeStore = new MemoryStore({data:employees, idProperty: "name"});
+        var employees = employeeStore.query({ department:"sales"}, {
+		start :0,
+		count :10,
+		sort:[{attribute:"name", descending: true}]
+	});
+	console.log(JSON.stringify(employees));
+
+
+
+	var chartData = [10000,9200,11811,12000,7662,13887,14200,12222,12000,10009,11288,12099];
+	var chartData2 = [5000,9400,1811,12500,17662,14887,14500,10222,10000,15009,13288,11099];
+	var id = 0;
+        var storeData = arrays.map(chartData2, function(value) {
+		return {
+			id: ++id,
+			value: value
+		};
+	});
+	 var store = new ObservableStore(new MemoryStore({
+        	data: {
+		    identifier: "id",
+	            items: storeData
+	        }
+	}));
+
+	var mychart = new Chart("chartNode");
+        mychart.setTheme(theme);
+
+	mychart.addPlot("default", {
+	    type : "Lines",
+            markers: true
+        });
+	mychart.addAxis("x");
+	mychart.addAxis("y", { min: 5000, max: 15000, vertical: true, fixLower: "major", fixUpper: "major" });
+
+        // Add the series of data
+        mychart.addSeries("January", chartData);
+        //mychart.addSeries("February", chartData2);
+	mychart.addSeries("February", new StoreSeries(store, { query: { } }, "value"));
+
+        // Render the chart!
+        mychart.render();
+	setTimeout(function() { store.remove(3); store.put({id: ++id, value: 5000}); }, 1500);
+	setTimeout(function() { mychart.updateSeries("February", chartData2); mychart.render() }, 3000);
+    });
+    </script>
+</body>
+</html>
