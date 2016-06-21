@@ -2,19 +2,22 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>Tutorial: Hello Dojo!</title>
+    <title>Tutorial: Hello dgrid!</title>
     <link rel="stylesheet" href="release/my/dijit/themes/claro/claro.css" media="screen" />
+    <link rel="stylesheet" href="release/my/dgrid/css/dgrid.css">
     <link rel="stylesheet" href="release/my/myapp/widget/css/AuthorWidget.css" media="screen" />
 </head>
 <body class="claro">
-    <h1 id="greeting">Dojo!</h1>
+    <h1 id="greeting">Hello dgrid!</h1>
 
 
+    <div id="grid"></div>
     <div id="authorContainer"></div>
 
 
     <script type="text/javascript">
 	var dojoConfig = {
+	    async: true,
 	    baseUrl: "./release/my/",
 	    selectorEngine: "lite",
 	    tlmSiblingOfDojo: false,
@@ -22,6 +25,8 @@
 		{ name: "dojo", location: "dojo" },
 		{ name: "dijit", location: "dijit" },
 		{ name: "dojox", location: "dojox" },
+		{ name: "dgrid", location: "../src/dgrid" },
+		{ name: "dstore", location: "../src/dstore" },
 		{ name: "my", location: "myapp", main: "app" }
 	   ],
 	    locale: "cs-cz"
