@@ -1,3 +1,4 @@
 release
 vendor
 composer.lock
+logs/*
