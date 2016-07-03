@@ -15,6 +15,26 @@ class Chat implements MessageComponentInterface {
 	}
     }
 
+    public static function sortBy($a, $b, array $sortBy) {
+	    foreach($sortBy as $sortRule) {
+		    $res = 0;
+		    $prop = $sortRule->property;
+		    switch($prop) {
+			    case 'id':
+				$res = $a->id - $b->id;
+				break;
+			    default:
+				$res = strnatcasecmp($a->$prop, $b->$prop);
+
+		    }
+		    if($sortRule->descending)
+			    $res *= -1;
+		    if($res !== 0)
+		    	return $res;
+	    }
+	    return 0;
+    }
+
     public function onOpen(ConnectionInterface $conn) {
         // Store the new connection to send messages to later
         $this->clients->attach($conn);
@@ -24,7 +44,12 @@ class Chat implements MessageComponentInterface {
     public function onMessage(ConnectionInterface $from, $msg) {
 
 	$command = json_decode($msg);
-	var_dump($command);
+	if(!empty($command->kwArgs->sortBy)) {
+		$sortBy = $command->kwArgs->sortBy;
+		usort($this->data, function ($a, $b) use ($sortBy) {
+			return Chat::sortBy($a, $b, $sortBy);
+		});
+	}
 	if($command->command === 'fetchRange') {
 		$start = $command->kwArgs->start;
 		$end = $command->kwArgs->end;

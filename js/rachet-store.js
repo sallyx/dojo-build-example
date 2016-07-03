@@ -12,6 +12,7 @@ define([
 		deferrers : null,
 		isOpen: false,
 		messageId : 1,
+		sortBy : [],
 		constructor : function (/*string*/ wsUrl) {
 			this.messages = [];
 			this.deferrers = {};
@@ -39,12 +40,14 @@ define([
 		},
 		remove: function(id) {
 		},
+		_createSortQuerier : function(sorted) {
+			this.sortBy = sorted;
+		},
 		fetch: function() {
 			return new QueryResults([]);
 		},
 		fetchRange: function (kwArgs) {
-		    var start = kwArgs.start,
-		        end = kwArgs.end;
+			kwArgs.sortBy = this.sortBy;
 			var data = new Deferred();
 			var len = new Deferred();
 			var id = this.messageId++;
