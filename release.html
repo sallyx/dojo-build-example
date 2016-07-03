@@ -2,49 +2,21 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>Tutorial: Hello Dojo!</title>
-    <link rel="stylesheet" href="release/my/dijit/themes/claro/claro.css" media="screen" />
-    <link rel="stylesheet" href="release/my/myapp/widget/css/AuthorWidget.css" media="screen" />
+    <title>Tutorial: WebSocket!</title>
+    <link rel="stylesheet" href="src/dijit/themes/claro/claro.css" media="screen" />
+    <link rel="stylesheet" href="src/dgrid/css/dgrid.css" media="screen" />
+    <link rel="stylesheet" href="src/dgrid/css/skins/claro.css" media="screen" />
 </head>
 <body class="claro">
-    <h1 id="greeting">Dojo!</h1>
+    <h1 id="greeting">WebSocket with Rachet!</h1>
 
 
-    <div id="authorContainer"></div>
+    <button id="button">Change first value</button>
+    <div id="container"></div>
 
 
-    <script type="text/javascript">
-	var dojoConfig = {
-	    baseUrl: "./release/my/",
-	    selectorEngine: "lite",
-	    tlmSiblingOfDojo: false,
-	    packages: [
-		{ name: "dojo", location: "dojo" },
-		{ name: "dijit", location: "dijit" },
-		{ name: "dojox", location: "dojox" },
-		{ name: "my", location: "myapp", main: "app" }
-	   ],
-	    locale: "cs-cz"
-	};
-    </script>
-    <script  src="release/my/dojo/dojo.js"></script>
-    <script  src="release/my/myapp/widget.js"></script>
-    <script type="text/javascript">
-    require(["dojo/request", "dojo/dom", "dojo/_base/array", "my/widget/AuthorWidget", "dojo/domReady!"],
-    function(request, dom, arrayUtil, AuthorWidget){
-    // Load up our authors
-    request("js/my/data/authors.json", {
-        handleAs: "json"
-    }).then(function(authors){
-        // Get a reference to our container
-        var authorContainer = dom.byId("authorContainer");
-
-        arrayUtil.forEach(authors, function(author){
-            // Create our widget and place it
-            var widget = new AuthorWidget(author).placeAt(authorContainer);
-        });
-     });
-   }); 
-    </script>
+    <script src="js/config.js"></script>
+    <script src="src/dojo/dojo.js"></script>
+    <script src="js/app.js"></script>
 </body>
 </html>

@@ -8,4 +8,4 @@ run:
 	sudo supervisord -c ./supervisor.conf
 
 stop:
-	sudo killall supervisord
+	sudo kill -SIGTERM supervisord
