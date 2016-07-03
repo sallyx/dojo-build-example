@@ -10,3 +10,9 @@
 [submodule "src/util"]
 	path = src/util
 	url = https://github.com/dojo/util.git
+[submodule "src/dstore"]
+	path = src/dstore
+	url = git@github.com:SitePen/dstore.git
+[submodule "src/dgrid"]
+	path = src/dgrid
+	url = git@github.com:SitePen/dgrid.git
