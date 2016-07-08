@@ -2,11 +2,12 @@ define([
 	'dojo/_base/declare',
 	'dijit/_WidgetBase',
 	'dijit/Toolbar',
-	'dijit/form/Button',
+	'dijit/form/Button'
 ],
 function(declare, _WidgetBase, Toolbar, Button) {
 	return declare([_WidgetBase], {
 		store: null,
+		value: null,
 		buildRendering: function() {
 		      var self = this;
 		      this.inherited(arguments);

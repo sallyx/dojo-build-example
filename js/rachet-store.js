@@ -22,26 +22,31 @@ define([
 			this._state = {
 				messages : [],
 				isOpen : false,
-				messageId : 0
+				messageId : 0,
+				wsUrl :wsUrl,
+				data: []
 			};
 			this.deferrers = {};
-			this.socket = new Reconnect(new Socket({url:wsUrl,error: function(e) {alert(e);}}));
+		},
+		postscript: function () {
+			this.inherited(arguments);
+			this.socket = new Reconnect(new Socket({url:this._state.wsUrl,error: function(e) {alert(e);}}));
 			var storeObj = this;
 			this.socket.on('open',function(event) {
 				storeObj._state.isOpen = true;
 				array.forEach(storeObj._state.messages, function(message) { this.socket.send(message)}, storeObj);
 				storeObj._state.messages = null;
 			});
+			collection = this;
 			this.socket.on('message', function(event) {
 				var answer = JSON.parse(event.data);
 				if(answer.command === 'fetchRange') {
-					var qs = new QueryResults(answer.data, {totalLength:answer.totalLength});
-					storeObj.deferrers[answer._id].data.resolve(qs);
+					storeObj.deferrers[answer._id].data.resolve(answer.data);
 					storeObj.deferrers[answer._id].totalLength.resolve(answer.totalLength);
 				} else {
 					storeObj.deferrers[answer._id].data.resolve(answer.result);
 				}
-				delete storeObj.deferrers[answer.id];
+				delete storeObj.deferrers[answer._id];
 			});
 		},
 		get: function (id) {
@@ -72,7 +77,9 @@ define([
 			var len = new Deferred();
 			kwArgs.sortBy = this.sortBy;
 			this._sendCommand('fetchRange', {kwArgs : kwArgs}, {data:data, totalLength:len});
-			return new QueryResults(data, {totalLength : len});
+			var qr = new QueryResults(data);
+			qr.totalLength  = len;
+			return qr;
 	        },
 		_sendCommand: function(command, opts, deferrers) {
 			opts.command = command;
