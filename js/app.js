@@ -2,6 +2,7 @@ require([
 		'dojo/_base/declare',
 		'dojo/on',
 		"dojo/dom", 
+		"dojo/dom-construct",
 		'rachet-store', 
 		"dstore/Memory",
 		"dstore/Trackable",
@@ -11,12 +12,15 @@ require([
 		'custom-editor',
 		'dojo/domReady!'
     ],
-    function(declare, on, dom, RachetStore, Memory, Trackable, Grid, Pagination, Editor, CustomEditor) {
+    function(declare, on, dom, domConstruct, RachetStore, Memory, Trackable, Grid, Pagination, Editor, CustomEditor) {
 
 
 	var Store = declare([RachetStore, Trackable]);
-	var myStore = new Store({wsUrl:'//localhost:8080'});
-
+	var myStore = new Store({wsUrl:'//localhost:8080', url: 'rest.php'});
+	myStore.on('socket-status-change',function(event) {
+		domConstruct.place('<span>'+event.message+'</span>', dom.byId('socket-status'), "only");
+	});
+	myStore.connect();
 	var MyGrid = declare([Grid, Pagination, Editor]);
 	var grid = new MyGrid({
         	collection: myStore,

@@ -5,9 +5,12 @@ define([
     'dstore/SimpleQuery',
     'dojox/socket',
     'dojox/socket/Reconnect',
+    "dojo/_base/xhr",
     'dojo/Deferred',
-    'dstore/QueryResults'
-], function (declare, array, Store, SimpleQuery, Socket, Reconnect, Deferred, QueryResults) {
+    'dstore/QueryResults',
+    'dojo/on',
+    "dojo/_base/lang"
+], function (declare, array, Store, SimpleQuery, Socket, Reconnect, xhr, Deferred, QueryResults, on, lang) {
     return declare([Store, SimpleQuery], {
 		socket : null,
 		deferrers : null,
@@ -24,22 +27,34 @@ define([
 				isOpen:    false,
 				messageId: 1,
 				wsUrl:     options.wsUrl,
+				url:     options.url,
 				data:      []
 			};
 			this.deferrers = {};
 		},
-		postscript: function () {
-			this.inherited(arguments);
-			this.socket =new Socket({url:this._state.wsUrl,error: function(e) {alert(e);}});
-			this.socket = new Reconnect(this.socket, { reconnectTime:1000});
+		connect: function () {
 			var storeObj = this;
+			var socketOptions = {
+				url:this._state.wsUrl,
+				error: lang.hitch(this, this._socketError),
+				transport: function(args) {
+					args.url = storeObj._state.url || storeObj._state.wsUrl;
+					return xhr.post(args);
+				}
+			};
+			this.socket = new Socket(socketOptions);
+			this.socket = new Reconnect(this.socket, { reconnectTime:1000});
 			this.socket.on('open',function(event) {
 				storeObj._state.isOpen = true;
 				array.forEach(storeObj._state.messages, function(message) { this.socket.send(message)}, storeObj);
 				storeObj._state.messages = null;
+				storeObj.emit('socket-status-change',{message:'Socket connection opened'});
 			});
-			collection = this;
+			this.socket.on('close', function(event) {
+				storeObj.emit('socket-status-change',{message:'Socket connection closed'});
+			});
 			this.socket.on('message', function(event) {
+				storeObj.emit('socket-status-change',{message:'Socket got message'});
 				var answer = JSON.parse(event.data);
 				if(answer._id) {
 					storeObj._resolveDeferrers(answer);
@@ -47,6 +62,9 @@ define([
 					storeObj._notifyChange(answer);
 				}
 			});
+		},
+		_socketError:function(event) {
+			this.emit('socket-status-change',{message:'Socket connection error'});
 		},
 		_resolveDeferrers(answer) {
 			if(answer.command === 'fetchRange') {
