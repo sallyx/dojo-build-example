@@ -15,7 +15,7 @@ require([
 
 
 	var Store = declare([RachetStore, Trackable]);
-	var myStore = new Store('//localhost:8080');
+	var myStore = new Store({wsUrl:'//localhost:8080'});
 
 	var MyGrid = declare([Grid, Pagination, Editor]);
 	var grid = new MyGrid({

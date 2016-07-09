@@ -40,7 +40,6 @@ class Chat implements MessageComponentInterface {
     public function onOpen(ConnectionInterface $conn) {
         // Store the new connection to send messages to later
         $this->clients->attach($conn);
-        echo "New connection! ({$conn->resourceId})\n";
     }
 
     public function onMessage(ConnectionInterface $from, $msg) {
@@ -65,12 +64,17 @@ class Chat implements MessageComponentInterface {
 	}
 
 	$from->send(json_encode($answer));
-        foreach ($this->clients as $client) { }
+	$answer->_id = null;
+	if(in_array($command->command, ['put','add','remove'])) {
+		foreach ($this->clients as $id => $client) {
+			if($client == $from) continue;
+			$client->send(json_encode($answer));
+		}
+	}
     }
 
     public function onClose(ConnectionInterface $conn) {
         $this->clients->detach($conn);
-        echo "Connection {$conn->resourceId} has disconnected\n";
     }
 
     public function onError(ConnectionInterface $conn, \Exception $e) {
@@ -101,7 +105,7 @@ class Chat implements MessageComponentInterface {
 	$answer = (object) array(
 		'_id' => $command->_id,
 		'command' => $command->command,
-		'result' => true
+		'result' => $command->id
     	);
 	return $answer;
     }
@@ -124,7 +128,7 @@ class Chat implements MessageComponentInterface {
 	$answer = (object) array(
 		'_id' => $command->_id,
 		'command' => $command->command,
-		'result' => true
+		'result' => null
     	);
 	foreach($this->data as $i =>$o) {
 		if($o->id == $command->object->id) {
@@ -132,6 +136,7 @@ class Chat implements MessageComponentInterface {
 			break;
 		}
 	}
+	$answer->result = $command->object;
 	return $answer;
     }
 
