@@ -10,17 +10,23 @@ require([
 		'dgrid/extensions/Pagination',
 		'dgrid/Editor',
 		'custom-editor',
+		'dstore/Rest',
 		'dojo/domReady!'
     ],
-    function(declare, on, dom, domConstruct, RachetStore, Memory, Trackable, Grid, Pagination, Editor, CustomEditor) {
+    function(declare, on, dom, domConstruct, RachetStore, Memory, Trackable, Grid, Pagination, Editor, CustomEditor, Rest) {
 
-
+	//*
 	var Store = declare([RachetStore, Trackable]);
-	var myStore = new Store({wsUrl:'//localhost:8080', url: 'rest.php'});
-	myStore.on('socket-status-change',function(event) {
+	var myStore = new Store({wsUrl:'//localhost:8080', restUrl: 'rest/'});
+	myStore.on('status-change',function(event) {
 		domConstruct.place('<span>'+event.message+'</span>', dom.byId('socket-status'), "only");
 	});
 	myStore.connect();
+	//*/
+	/*
+	var Store = declare([Rest]);
+	var myStore = new Store({target:  'rest/'});
+	//*/
 	var MyGrid = declare([Grid, Pagination, Editor]);
 	var grid = new MyGrid({
         	collection: myStore,
