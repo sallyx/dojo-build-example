@@ -1,0 +1,9 @@
+<Limit GET POST PUT DELETE>
+  Allow from all
+</Limit>
+
+
+RewriteEngine On
+RewriteBase /~petr/dojo/rest/
+
+RewriteRule ([0-9]+) index.php?id=$0 [L]

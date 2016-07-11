@@ -2,3 +2,4 @@ release
 vendor
 composer.lock
 logs/*
+db/data.json

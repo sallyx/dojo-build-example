@@ -15,7 +15,7 @@ require([
     ],
     function(declare, on, dom, domConstruct, RachetStore, Memory, Trackable, Grid, Pagination, Editor, CustomEditor, Rest) {
 	var url = new URL(window.location);
-	//*
+	/*
 	var Store = declare([RachetStore, Trackable]);
 	var myStore = new Store({wsUrl:'//'+url.hostname+':8080', restUrl: 'rest/'});
 	myStore.on('status-change',function(event) {
@@ -23,7 +23,7 @@ require([
 	});
 	myStore.connect();
 	//*/
-	/*
+	//*
 	var Store = declare([Rest, Trackable]);
 	var myStore = new Store({target:  'rest/'});
 	//*/

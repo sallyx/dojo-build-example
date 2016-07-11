@@ -62,6 +62,7 @@ class Chat implements MessageComponentInterface {
     }
 
     public function onMessage(ConnectionInterface $from, $msg) {
+	$this->setupData(); //read external changes
 
 	$command = json_decode($msg);
 	switch($command->command) {
