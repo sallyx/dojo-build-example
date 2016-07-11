@@ -7,14 +7,33 @@ class Chat implements MessageComponentInterface {
 
     private $sequence = 0;
     private $clients;
+    private $file;
     private $data = array();
 
     public function __construct() {
+	$this->file = dirname(__DIR__).'/db/data.json';
         $this->clients = new \SplObjectStorage;
+	$this->setupData();
+    }
+
+    private function  setupData() {
+	$data = @file_get_contents($this->file);
+	if($data) {
+		$this->data = json_decode($data);
+		foreach($this->data as $o) {
+			$this->sequence = max($this->sequence, $o->id);
+		}
+		return;
+	}
 	for($i = 1; $i < rand(100,1000); $i++) {
-		$this->data[] = (object) array('id' => $i, 'name' => 'Name '.$i, 'value' => rand(0,500));
+		$this->data[] = (object) array('id' => $i, 'name' => 'Name '.$i, 'value' => rand(0,500),'updated'=>time(),'removed'=>0);
 	}
 	$this->sequence = $i;
+	$this->saveData();
+    }
+
+    private function saveData() {
+	return file_put_contents($this->file, json_encode($this->data));
     }
 
     public static function sortBy($a, $b, array $sortBy) {
@@ -66,6 +85,7 @@ class Chat implements MessageComponentInterface {
 	$from->send(json_encode($answer));
 	$answer->_id = null;
 	if(in_array($command->command, ['put','add','remove'])) {
+		$this->saveData();
 		foreach ($this->clients as $id => $client) {
 			if($client == $from) continue;
 			$client->send(json_encode($answer));
@@ -94,14 +114,21 @@ class Chat implements MessageComponentInterface {
 	$answer = (object) array(
 		'_id' => $command->_id,
 		'command' => $command->command,
-		'data' => array_slice($this->data, $start, $end-$start),
+		'data' => array_slice(array_filter($this->data,function($a) { return !$a->removed;}), $start, $end-$start),
 		'totalLength' => count($this->data)
 	);
 	return $answer;
     }
 
     public function remove($command) {
-	$this->data = array_filter($this->data, function($a) use($command) { return $command->id !== $a->id;});
+	    $this->data = array_map(function($a) use($command) { 
+		    if($command->id === $a->id) {
+			    $a->removed = 1;
+			    $a->updated = time();
+		    } 
+		    return $a;
+
+	    }, $this->data);
 	$answer = (object) array(
 		'_id' => $command->_id,
 		'command' => $command->command,
@@ -117,7 +144,7 @@ class Chat implements MessageComponentInterface {
 		'result' => (object) array()
     	);
 	foreach($this->data as $o) {
-		if($o->id == $command->id) {
+		if($o->id == $command->id && !$o->removed) {
 			$answer->result = $o;
 			break;
 		}
@@ -133,6 +160,7 @@ class Chat implements MessageComponentInterface {
 	foreach($this->data as $i =>$o) {
 		if($o->id == $command->object->id) {
 			$this->data[$i] = $command->object;
+			$this->data[$i]->updated = time();
 			break;
 		}
 	}
@@ -148,6 +176,7 @@ class Chat implements MessageComponentInterface {
     	);
 	$o = $command->object;
 	$o->id = $this->sequence++;
+	$o->updated = time();
 	$this->data[]= $o;
 	$answer->result = $o;
 	return $answer;

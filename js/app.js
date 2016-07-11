@@ -14,17 +14,17 @@ require([
 		'dojo/domReady!'
     ],
     function(declare, on, dom, domConstruct, RachetStore, Memory, Trackable, Grid, Pagination, Editor, CustomEditor, Rest) {
-
+	var url = new URL(window.location);
 	//*
 	var Store = declare([RachetStore, Trackable]);
-	var myStore = new Store({wsUrl:'//localhost:8080', restUrl: 'rest/'});
+	var myStore = new Store({wsUrl:'//'+url.hostname+':8080', restUrl: 'rest/'});
 	myStore.on('status-change',function(event) {
 		domConstruct.place('<span>'+event.message+'</span>', dom.byId('socket-status'), "only");
 	});
 	myStore.connect();
 	//*/
 	/*
-	var Store = declare([Rest]);
+	var Store = declare([Rest, Trackable]);
 	var myStore = new Store({target:  'rest/'});
 	//*/
 	var MyGrid = declare([Grid, Pagination, Editor]);
