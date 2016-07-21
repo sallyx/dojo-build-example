@@ -18,9 +18,11 @@ define([
 	sortBy : null,
 	_state : null,
 	deferrers : null,
+	options: null,
 	constructor: function(options) {
 		this.deferrers = {};
 		this.sortBy = [];
+		this.options = options;
 		this._state = {
 			messages:  [],
 			isOpen:    false,
@@ -29,7 +31,6 @@ define([
 		};
 	},
 	connect: function () {
-		var storeObj = this;
 		var socketOptions = {
 			url:this._state.wsUrl,
 			error: lang.hitch(this, this._socketError),
@@ -40,23 +41,37 @@ define([
 			}
 		};
 		this.socket = new Socket(socketOptions);
-		this.socket.on('open',function(event) {
-			storeObj._state.isOpen = true;
-			array.forEach(storeObj._state.messages, function(message) { this.socket.send(message)}, storeObj);
-			storeObj._state.messages = null;
-			storeObj.emit('status-change',{status: 'open', message:'Socket connection opened'});
-		});
-		this.socket.on('close', function(event) {
-			storeObj.emit('status-change',{status: 'close', message:'Socket connection closed'});
-		});
-		this.socket.on('message', function(event) {
+		var timeout = setTimeout(lang.hitch(this, function() {
+			if(this.socket.readyState == this.socket.OPEN) {
+				return;
+			}
+			this.socket.close();
+			this.emit('status-change',{status:'timeout', message:'Socket connection timeout'});
+		}), this.options.timeout || 10000);
+
+		this.socket.on('open', lang.hitch(this, function(event) {
+			clearTimeout(timeout);
+			if(this.socket.readyState != this.socket.OPEN) {
+				return;
+			}
+			this._state.isOpen = true;
+			array.forEach(this._state.messages, function(message) { 
+				this.socket.send(message)
+			}, this);
+			this._state.messages = null;
+			this.emit('status-change',{status: 'open', message:'Socket connection opened'});
+		}));
+		this.socket.on('close', lang.hitch(this, function(event) {
+			this.emit('status-change',{status: 'close', message:'Socket connection closed'});
+		}));
+		this.socket.on('message', lang.hitch(this, function(event) {
 			var answer = JSON.parse(event.data);
 			if(answer._id) {
-				storeObj._resolveDeferrers(answer);
+				this._resolveDeferrers(answer);
 			} else {
-				storeObj._notifyChange(answer);
+				this._notifyChange(answer);
 			}
-		});
+		}));
 	},
 	_socketError:function(event) {
 		this.emit('status-change',{status: 'error', message:'Socket connection error'});
@@ -152,22 +167,35 @@ define([
 	connect: function() {
 		this.store = new wsStore(this.options);
 		this.propagateEvents();
+
 		this.store.on('status-change', lang.hitch(this, function(event) {
 			if(event.status !== 'close' && event.status !== 'error') {
 				return;
 			}
 			var deferrers  = this.store.deferrers;
-			var myRest = declare([Rest]);
+			this.store._state.messages = null;
+			var myRest = declare([Rest, SimpleQuery]);
 			this.store = new myRest({target: this.options.restUrl});
 			this.propagateEvents();
-			this.emit('status-change', {status:'fallback', message: 'Store fallback to REST'});
 			if(deferrers) {
 				for(var _id in deferrers) {
 					var d = deferrers[_id];
 					var opts = d.opts;
-					this.store[opts.command].apply(this.store, opts.args);
+					var def = this.store[opts.command].apply(this.store, opts.args);
+					(function(d,def) {
+						def.then(function(data) {
+							d.data.resolve(data);
+							if(d.totalLength && data.totalLength) {
+								data.totalLength.then(function(tl) {
+									d.totalLength.resolve(tl);
+								});
+							}
+						});
+					})(d,def);
 				}
 			}
+			// emit after last 'Socket connection closed'
+			setTimeout(lang.hitch(this,function() {this.emit('status-change', {status:'fallback', message: 'Store fallback to REST'}); }), 10);
 		}));
 		this.store.connect();
 	},
