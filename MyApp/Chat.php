@@ -36,6 +36,12 @@ class Chat implements MessageComponentInterface {
 	return file_put_contents($this->file, json_encode($this->data));
     }
 
+    private function getTotalLength() {
+	    return array_reduce($this->data, function($carry, $item) {
+		return $carry + 1 - $item->removed;
+	    }, 0);
+    }
+
     public static function sortBy($a, $b, array $sortBy) {
 	    foreach($sortBy as $sortRule) {
 		    $res = 0;
@@ -116,7 +122,7 @@ class Chat implements MessageComponentInterface {
 		'_id' => $command->_id,
 		'command' => $command->command,
 		'data' => array_slice(array_filter($this->data,function($a) { return !$a->removed;}), $start, $end-$start),
-		'totalLength' => count($this->data)
+		'totalLength' => $this->getTotalLength()
 	);
 	return $answer;
     }
