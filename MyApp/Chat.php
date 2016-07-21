@@ -28,7 +28,7 @@ class Chat implements MessageComponentInterface {
 	for($i = 1; $i < rand(100,1000); $i++) {
 		$this->data[] = (object) array('id' => $i, 'name' => 'Name '.$i, 'value' => rand(0,500),'updated'=>time(),'removed'=>0);
 	}
-	$this->sequence = $i;
+	$this->sequence = --$i;
 	$this->saveData();
     }
 
@@ -176,7 +176,7 @@ class Chat implements MessageComponentInterface {
 		'result' => null
     	);
 	$o = $command->object;
-	$o->id = $this->sequence++;
+	$o->id = ++$this->sequence;
 	$o->updated = time();
 	$o->removed = 0;
 	$this->data[]= $o;
