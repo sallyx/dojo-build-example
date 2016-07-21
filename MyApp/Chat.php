@@ -178,6 +178,7 @@ class Chat implements MessageComponentInterface {
 	$o = $command->object;
 	$o->id = $this->sequence++;
 	$o->updated = time();
+	$o->removed = 0;
 	$this->data[]= $o;
 	$answer->result = $o;
 	return $answer;

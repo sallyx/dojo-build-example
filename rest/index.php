@@ -112,11 +112,11 @@ class RestModel {
 		$this->chat->onMessage(new connection, $msg);
 	}
 	public function add($getParams) {
+		$_POST = file_get_contents('php://input');
 		$msg = (object) array(
 			'_id' => 1,
-			'command' => 'put',
-			'id' => $getParams->id,
-			'object' => json_decode($_PUT)
+			'command' => 'add',
+			'object' => json_decode($_POST)
 		);
 		$msg = json_encode($msg);
 		$this->chat->onMessage(new connection, $msg);
