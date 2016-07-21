@@ -1,4 +1,0 @@
-require([
-	'my/widget/AuthorWidget'
-]);
-
