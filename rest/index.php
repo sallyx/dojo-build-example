@@ -66,6 +66,7 @@ class RestModel {
 			$vals = explode(',', $m[2]);
 			if($m[1] === 'sort') {
 				foreach($vals as $v) {
+					if(!$v) continue;
 					$sort = (object) array('property' => substr($v,1), 'descending' => false);
 					if($v[0] === '-') {
 						$sort->descending = true;

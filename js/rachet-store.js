@@ -159,29 +159,34 @@ define([
     });
 
     return declare([Store], {
-	store : null,
+	_xstore : null,
 	options: null,
 	constructor : function (options) {
 		this.options = options;
+		this._xstore = {};
+	},
+	// unfortunatery dgrid makes copy of store so properties must be stored as references
+	getStore: function() {
+		return this._xstore.store;
 	},
 	connect: function() {
-		this.store = new wsStore(this.options);
+		this._xstore.store = new wsStore(this.options);
 		this.propagateEvents();
 
-		this.store.on('status-change', lang.hitch(this, function(event) {
+		this.getStore().on('status-change', lang.hitch(this, function(event) {
 			if(event.status !== 'close' && event.status !== 'error') {
 				return;
 			}
-			var deferrers  = this.store.deferrers;
-			this.store._state.messages = null;
+			var deferrers  = this.getStore().deferrers;
+			this.getStore()._state.messages = null;
 			var myRest = declare([Rest, SimpleQuery]);
-			this.store = new myRest({target: this.options.restUrl});
+			this._xstore.store = new myRest({target: this.options.restUrl});
 			this.propagateEvents();
 			if(deferrers) {
 				for(var _id in deferrers) {
 					var d = deferrers[_id];
 					var opts = d.opts;
-					var def = this.store[opts.command].apply(this.store, opts.args);
+					var def = this.getStore()[opts.command].apply(this.getStore(), opts.args);
 					(function(d,def) {
 						def.then(function(data) {
 							d.data.resolve(data);
@@ -197,13 +202,13 @@ define([
 			// emit after last 'Socket connection closed'
 			setTimeout(lang.hitch(this,function() {this.emit('status-change', {status:'fallback', message: 'Store fallback to REST'}); }), 10);
 		}));
-		this.store.connect();
+		this.getStore().connect();
 	},
 	propagateEvents: function() {
 		var my = this;
 		var eventTypes = {add: 1, update: 1, 'delete': 1, 'status-change': 1};
 		for (var type in eventTypes) {
-			this.store.on(type, (function(type) {
+			this.getStore().on(type, (function(type) {
 				return function(event) {
 					my.emit(type, event);
 				};
@@ -211,35 +216,35 @@ define([
 		}
 	},
 	get: function (id) {
-		return this.store.get(id);
+		return this.getStore().get(id);
 	},
 	add: function(object) {
-		return this.store.add(object);
+		return this.getStore().add(object);
 	},
 	put: function(object) {
-		return this.store.put(object);
+		return this.getStore().put(object);
 	},
 	remove: function(id) {
-		return this.store.remove(id);
+		return this.getStore().remove(id);
 	},
 	fetch: function() {
-		return this.store.fetch();
+		return this.getStore().fetch();
 	},
 	fetchRange: function (kwArgs) {
-		this.store.queryLog = this.queryLog;
-		return this.store.fetchRange(kwArgs);
+		this.getStore().queryLog = this.queryLog;
+		return this.getStore().fetchRange(kwArgs);
 	},
 	_createFilterQuerier: function (filter) {
-		return this.store._createFilterQuerier(filter);
+		return this.getStore()._createFilterQuerier(filter);
 	},
 	_getFilterComparator: function (type) {
-		return this.store._getFilterComparator(type);
+		return this.getStore()._getFilterComparator(type);
 	},
 	_createSelectQuerier: function (properties) {
-		return this.store._createSelectQuerier(properties);
+		return this.getStore()._createSelectQuerier(properties);
 	},
 	_createSortQuerier : function(sorted) {
-		return this.store._createSortQuerier(sorted);
+		return this.getStore()._createSortQuerier(sorted);
 	},
 	sort: function() {
 		return this.inherited(arguments);
