@@ -17,7 +17,7 @@ chmod o+w db
 ### Step 2
 Update RewriteBase in rest/.htaccess
 
-## Step 3
+### Step 3
 
 Configure apache to support REST. For example, in /etc/apache2/mod_userdir.conf:
 
@@ -35,3 +35,10 @@ Configure apache to support REST. For example, in /etc/apache2/mod_userdir.conf:
 ```
 
 Restart apache.
+
+
+## Run rachet
+
+```bash
+php bin/chat-server.php
+```
