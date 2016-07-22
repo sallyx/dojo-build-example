@@ -132,8 +132,9 @@ define([
 				}
 			}
 		}
-		if(!kwArgs.sortBy)
+		if(!kwArgs.sortBy) {
 			kwArgs.sortBy = this.sortBy;
+		}
 		this.sortBy = kwArgs.sortBy;
 		var data = new Deferred();
 		var len = new Deferred();

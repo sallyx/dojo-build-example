@@ -17,7 +17,7 @@ require([
 	var url = new URL(window.location);
 	//*
 	var Store = declare([RachetStore, Trackable]);
-	var myStore = new Store({wsUrl:'//'+url.hostname+':8080', restUrl: 'rest/',timeout:500});
+	var myStore = new Store({wsUrl:'//'+url.hostname+':8080', restUrl: 'rest/',timeout:1500});
 	myStore.on('status-change',function(event) {
 		domConstruct.place('<span>'+event.message+'</span>', dom.byId('socket-status'), "only");
 	});
