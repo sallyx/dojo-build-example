@@ -15,4 +15,4 @@
 	url = https://github.com/SitePen/dstore.git
 [submodule "src/dgrid"]
 	path = src/dgrid
-	url = git@github.com:SitePen/dgrid.git
+	url = https://github.com/SitePen/dgrid.git
