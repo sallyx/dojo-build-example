@@ -45,6 +45,7 @@ class Chat implements MessageComponentInterface {
     public static function sortBy($a, $b, array $sortBy) {
 	    foreach($sortBy as $sortRule) {
 		    $res = 0;
+		    if(empty($sortRule->property)) continue;
 		    $prop = $sortRule->property;
 		    switch($prop) {
 			    case 'id':
